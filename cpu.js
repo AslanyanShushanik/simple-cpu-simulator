@@ -10,7 +10,7 @@ class FakeCPU {
       r7: null,
       r8: null,
       flag: null,
-      labels: {},
+      ip: 0,
     };
   }
 
@@ -55,23 +55,11 @@ class FakeCPU {
   }
 
   cmpReg(arg1, arg2) {
-    if (this.registers[arg1] > this.registers[arg2]) {
-      this.registers.flag = 1;
-    } else if (this.registers[arg1] < this.registers[arg2]) {
-      this.registers.flag = -1;
-    } else {
-      this.registers.flag = 0;
-    }
+    this.registers.flag = this.registers[arg1] - this.registers[arg2];
   }
 
   cmpImm(arg1, arg2) {
-    if (arg1 > arg2) {
-      this.registers.flag = 1;
-    } else if (arg1 < arg2) {
-      this.registers.flag = -1;
-    } else {
-      this.registers.flag = 0;
-    }
+    this.registers.flag = this.registers[arg1] - arg2;
   }
 
   andReg(arg1, arg2) {
@@ -102,42 +90,52 @@ class FakeCPU {
     this.registers[arg] = ~this.registers[arg];
   }
 
-  jl(label) {
-    if (this.registers.flag === -1) {
-      return this.registers.labels[label];
+  jl(ip) {
+    if (this.registers.flag > 0) {
+      this.setIP(ip);
+    } else {
+      this.setIP(this.registers.ip + 1);
     }
   }
 
-  jle(label) {
-    if (this.registers.flag === -1 || this.registers.flag === 0) {
-      return this.registers.labels[label];
+  jle(ip) {
+    if (this.registers.flag >= 0) {
+      this.setIP(ip);
+    } else {
+      this.setIP(this.registers.ip + 1);
     }
   }
 
-  jg(label) {
-    if (this.registers.flag === 1) {
-      return this.registers.labels[label];
+  jg(ip) {
+    if (this.registers.flag < 0) {
+      this.setIP(ip);
+    } else {
+      this.setIP(this.registers.ip + 1);
     }
   }
 
-  jge(label) {
-    if (this.registers.flag === 1 || this.registers.flag === 0) {
-      return this.registers.labels[label];
+  jge(ip) {
+    if (this.registers.flag <= 0) {
+      this.setIP(ip);
+    } else {
+      this.setIP(this.registers.ip + 1);
     }
   }
 
-  je(label) {
+  je(ip) {
     if (this.registers.flag === 0) {
-      return this.registers.labels[label];
+      this.setIP(ip);
+    } else {
+      this.setIP(this.registers.ip + 1);
     }
   }
 
-  jump(label) {
-    return this.registers.labels[label];
+  jump(ip) {
+    this.setIP(ip);
   }
 
-  setLabel(label, indx) {
-    this.registers.labels = { ...this.registers.labels, [label]: indx};
+  setIP(ip) {
+    this.registers.ip = ip;
   }
 }
 

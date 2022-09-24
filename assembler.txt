@@ -5,14 +5,13 @@ mov r3, 10
 xor r3, r1
 mov r7, r3
 not r7
-or r2, r3
 mov r5, 44
 mov r8, 2
 mov r6, r8
 and r6, 3
+mov r2, 3
 mul r4, r2
 Label:
 sub r5, 2
-cmp r2, r8
+cmp r2, r5
 jg Label
-div r5, r8
